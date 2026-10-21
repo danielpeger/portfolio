@@ -1,0 +1,187 @@
+@font-face {
+  font-family: "General Sans";
+  src:
+    url("https://cdn.fontshare.com/wf/LHQJ5KSAL7VGAEIDSTEXCCOIUKFLT2I6/GW57XUEG4ZBVMLZZTQZTGYPROITRRQ5W/JA3IZUEMJ2J6WWT2OQVJOAWDXO3YL4YG.woff2")
+      format("woff2-variations"),
+    url("https://cdn.fontshare.com/wf/LHQJ5KSAL7VGAEIDSTEXCCOIUKFLT2I6/GW57XUEG4ZBVMLZZTQZTGYPROITRRQ5W/JA3IZUEMJ2J6WWT2OQVJOAWDXO3YL4YG.woff2")
+      format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src:
+    url("https://cdn.fontshare.com/wf/RRO6TYZXO7WQBHSH4BZYSTI7E7T2HKLF/55LXPUDQQQTSLB3M2T377FIN2EKQQWJY/3HUYMY6WP3BZQYPOVGG6IZQAM476CQDC.woff2")
+      format("woff2-variations"),
+    url("https://cdn.fontshare.com/wf/RRO6TYZXO7WQBHSH4BZYSTI7E7T2HKLF/55LXPUDQQQTSLB3M2T377FIN2EKQQWJY/3HUYMY6WP3BZQYPOVGG6IZQAM476CQDC.woff2")
+      format("woff2");
+  font-weight: 200 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --weight-medium: 500;
+  --weight-body: 470;
+  --color-text: #000000;
+  --color-muted: #8c8c8c;
+  --color-bg: #ffffff;
+  --color-placeholder: #c8c8c8;
+  --color-border: #d4d4d4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: "General Sans", sans-serif;
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wght" var(--weight-medium);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: normal;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: 78px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wght" var(--weight-medium);
+  text-align: left;
+}
+
+h1 {
+  font-size: 24px;
+  line-height: 30px;
+}
+
+h2 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+p {
+  margin: 0;
+  color: var(--color-muted);
+  font-weight: var(--weight-body);
+  font-variation-settings: "wght" var(--weight-body);
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+strong {
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wght" var(--weight-medium);
+}
+
+ul {
+  margin: 0;
+  padding: 0 0 0 1.25em;
+  list-style: disc;
+  color: var(--color-muted);
+  font-weight: var(--weight-body);
+  font-variation-settings: "wght" var(--weight-body);
+  text-align: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+li + li {
+  margin-top: 8px;
+}
+
+icon-arrow,
+icon-external,
+icon-play,
+icon-pause,
+icon-spinner {
+  display: block;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+icon-arrow svg,
+icon-external svg,
+icon-play svg,
+icon-pause svg,
+icon-spinner svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+icon-play[hidden],
+icon-pause[hidden],
+icon-spinner[hidden] {
+  display: none;
+}
+
+icon-spinner {
+  animation: icon-spin 0.8s linear infinite;
+}
+
+@keyframes icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  icon-spinner {
+    animation: none;
+  }
+}
+
+icon-arrow {
+  color: var(--color-text);
+}
+
+icon-external,
+icon-play,
+icon-pause,
+icon-spinner {
+  color: var(--color-muted);
+}

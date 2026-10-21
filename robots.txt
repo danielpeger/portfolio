@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /audio/
+
+Sitemap: https://www.danielpeger.xyz/sitemap.xml

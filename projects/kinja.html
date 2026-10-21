@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gizmodo navigation — Daniel Péger</title>
+    <meta
+      name="description"
+      content="Daniel Péger’s Gizmodo and Kinja navigation redesign raised task success from 60% to 94.4% across a multi-brand publishing network."
+    />
+    <meta name="author" content="Daniel Péger" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <link rel="canonical" href="https://www.danielpeger.xyz/projects/kinja" />
+    <link rel="author" href="https://www.danielpeger.xyz/" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Daniel Péger" />
+    <meta property="og:title" content="Gizmodo navigation — Daniel Péger" />
+    <meta
+      property="og:description"
+      content="Daniel Péger’s Gizmodo and Kinja navigation redesign raised task success from 60% to 94.4%."
+    />
+    <meta
+      property="og:url"
+      content="https://www.danielpeger.xyz/projects/kinja"
+    />
+    <meta property="og:image" content="https://www.danielpeger.xyz/og.png" />
+    <meta
+      property="og:image:alt"
+      content="Daniel Péger, interaction designer"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Daniel Péger",
+                "item": "https://www.danielpeger.xyz/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Gizmodo navigation",
+                "item": "https://www.danielpeger.xyz/projects/kinja"
+              }
+            ]
+          },
+          {
+            "@type": "CreativeWork",
+            "name": "Gizmodo navigation redesign",
+            "url": "https://www.danielpeger.xyz/projects/kinja",
+            "author": {
+              "@type": "Person",
+              "name": "Daniel Péger",
+              "url": "https://www.danielpeger.xyz/"
+            }
+          }
+        ]
+      }
+    </script>
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="stylesheet" href="project.css" />
+    <script
+      type="module"
+      blocking="render"
+      src="https://cdn.jsdelivr.net/npm/justif@0.9.2/dist/auto.js"
+      integrity="sha384-tn0+3WympyLDyLwzfn2wDzv3FSd1LMydAE+6/LP4Oju3lb1Zgv3KiTCeTgz5baIx"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="module"
+      blocking="render"
+      src="../progressive-image/progressive-image.js"
+    ></script>
+    <script
+      type="module"
+      blocking="render"
+      src="../progressive-video/progressive-video.js"
+    ></script>
+  </head>
+  <body>
+    <div class="page">
+      <a class="home" href="../index.html"
+        ><icon-arrow></icon-arrow>Daniel Péger</a
+      >
+      <progressive-image
+        src="../assets/gizmodo/gizmodo"
+        width="512"
+        height="410"
+        alt="Gizmodo"
+      ></progressive-image>
+      <main>
+        <h1>Gizmodo navigation redesign</h1>
+        <article>
+          <p>
+            In 2019 I was part of the team of 4 designers rethinking navigation
+            on the Kinja platform, where readers kept getting lost between sites
+            and sections. Through two rounds of prototyping and moderated user
+            testing, we raised task success from 60% to 94.4% and shipped a
+            navigation that measurably improved engagement across the whole
+            network.
+          </p>
+          <p>
+            Kinja was the publishing platform powering sites like Gizmodo, The
+            Onion, Jezebel, Kotaku, The A.V. Club and more. Together these
+            brands reached around 100 million unique readers a month.
+          </p>
+          <h2>Readers couldn't tell where they were</h2>
+          <figure>
+            <progressive-video
+              src="../assets/gizmodo/nav-problem.mp4"
+              width="1600"
+              height="900"
+            ></progressive-video>
+            <figcaption>
+              Clicking on a Muse story on the Jezebel home page makes most of
+              the nav disappear
+            </figcaption>
+          </figure>
+          <p>
+            Kinja had many page types, sections & story formats with independent
+            navigation components. Notice how navigation collapses on the
+            example above: the section menu disappears, the logo changes and now
+            links to the Muse front page. There's no obvious way to get back to
+            the Jezebel front page. This was the main problem.
+          </p>
+          <p>
+            We came up with 2 additional goal statements, so the final goals
+            were:
+          </p>
+          <ul>
+            <li>
+              Increase <strong>engagement</strong> by allowing readers to
+              explore content across front pages, sections, and article pages
+              with confidence.
+            </li>
+            <li>
+              Expand <strong>site brand voices</strong> while maintaining
+              simplicity of a consistent navigation UI.
+            </li>
+            <li>
+              <strong>Network effect</strong>: introduce users to sites across
+              the network through a clear navigation structure.
+            </li>
+          </ul>
+          <p>
+            To get a better idea of key jobs to be done, we mapped them per our
+            3 personas.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">
+                  As a reader I want to … using the kinja nav.
+                </th>
+                <th scope="col">Votes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>know where I am</td>
+                <td>21</td>
+              </tr>
+              <tr>
+                <td>go back to the front page, find more content</td>
+                <td>21</td>
+              </tr>
+              <tr>
+                <td>
+                  quickly go to a section of the site I like
+                  (topic/tag/author/format/etc.)
+                </td>
+                <td>18</td>
+              </tr>
+              <tr>
+                <td>find out what this site is about</td>
+                <td>17</td>
+              </tr>
+              <tr>
+                <td>
+                  access profile functions: posts/comments I wrote/saved, change
+                  my pic
+                </td>
+                <td>16</td>
+              </tr>
+              <tr>
+                <td>know when someone replies to a comment I made</td>
+                <td>14</td>
+              </tr>
+              <tr>
+                <td>find a specific post I read earlier</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>
+                  log out, because I'm either on a shared computer, or I have
+                  multiple accounts
+                </td>
+                <td>8</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <th scope="col">
+                  As an author I want to … using the kinja nav.
+                </th>
+                <th scope="col">Votes</th>
+              </tr>
+              <tr>
+                <td>write a new post</td>
+                <td>17</td>
+              </tr>
+              <tr>
+                <td>resume writing a post</td>
+                <td>17</td>
+              </tr>
+              <tr>
+                <td>find and manage posts others wrote</td>
+                <td>12</td>
+              </tr>
+              <tr>
+                <td>know if someone comments on my post</td>
+                <td>12</td>
+              </tr>
+            </tbody>
+            <tbody>
+              <tr>
+                <th scope="col">
+                  As an advertiser I want to … using the kinja nav.
+                </th>
+                <th scope="col">Votes</th>
+              </tr>
+              <tr>
+                <td>check on my sponsored site</td>
+                <td>14</td>
+              </tr>
+              <tr>
+                <td>check on my sponsored section</td>
+                <td>13</td>
+              </tr>
+              <tr>
+                <td>check on my sponsored post</td>
+                <td>13</td>
+              </tr>
+            </tbody>
+          </table>
+          <h2>Three concepts, six prototypes</h2>
+          <figure>
+            <progressive-image
+              src="../assets/gizmodo/sketches"
+              width="512"
+              height="288"
+              alt="Sketches of the Kinja navigation: the ribbon, opening animation, vertical site tabs, and network menu"
+              style="border: 1px solid var(--color-border)"
+            ></progressive-image>
+            <figcaption>Our inital sketches</figcaption>
+          </figure>
+          <p>
+            After sketching there was enough diagreement that we decided to let
+            evidence pick the winner an user-test 3 concepts against each other.
+          </p>
+          <figure>
+            <progressive-image
+              src="../assets/gizmodo/kibbon"
+              width="512"
+              height="410"
+              alt="The Ribbon: a vertical menu of network sites and sections sliding over a Gizmodo article"
+            ></progressive-image>
+            <figcaption>The Ribbon</figcaption>
+          </figure>
+          <figure>
+            <progressive-image
+              src="../assets/gizmodo/odc"
+              width="512"
+              height="410"
+              alt="ODC: a horizontal section bar, network menu, and sections drawer on a Gizmodo article"
+            ></progressive-image>
+            <figcaption>ODC</figcaption>
+          </figure>
+          <figure>
+            <progressive-image
+              src="../assets/gizmodo/magiccards"
+              width="512"
+              height="410"
+              alt="Magic cards: a network menu of colored brand cards"
+            ></progressive-image>
+            <figcaption>Magic cards</figcaption>
+          </figure>
+          <p>2 factors that made this situation unique:</p>
+          <ul>
+            <li>
+              With a 50–50 reader mobile-desktop split, every concept had to be
+              designed and tested twice, once for each form factor.
+            </li>
+            <li>
+              This was the first project at Kinja to rely heavily on qualitative
+              user testing, so we had to build the research foundations —
+              guidelines, screeners, scoring — from scratch.
+            </li>
+          </ul>
+          <div class="section-head">
+            <h2>The final product</h2>
+            <hr class="rule" />
+          </div>
+          <progressive-video
+            src="../assets/gizmodo/nav.mp4"
+            width="1600"
+            height="900"
+          ></progressive-video>
+        </article>
+      </main>
+    </div>
+    <script type="module" src="../icons/icons.js"></script>
+  </body>
+</html>

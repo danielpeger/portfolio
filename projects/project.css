@@ -1,0 +1,113 @@
+.page {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.home {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: fit-content;
+  padding: 56px 0 24px;
+}
+
+.home icon-arrow {
+  transform: scaleX(-1);
+}
+
+.hero {
+  height: 283px;
+  background: var(--color-placeholder);
+}
+
+main {
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+article h2 {
+  margin: 16px 0 8px 0;
+}
+
+article .section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+article .section-head h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: normal;
+}
+
+article .rule {
+  height: 0;
+  border: 0;
+  border-top: 1px solid var(--color-text);
+  margin: 0;
+}
+
+article figure {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 8px 0;
+}
+
+article figure figcaption {
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--color-muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+article th,
+article td {
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  font-weight: var(--weight-body);
+  font-variation-settings: "wght" var(--weight-body);
+  color: var(--color-muted);
+  hyphens: manual;
+}
+
+article th {
+  font-weight: var(--weight-medium);
+  font-variation-settings: "wght" var(--weight-medium);
+  color: var(--color-text);
+}
+
+article tbody + tbody th {
+  padding-top: 24px;
+}
+
+article th:last-child,
+article td:last-child {
+  width: 1%;
+  padding-left: 16px;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}

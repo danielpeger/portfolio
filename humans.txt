@@ -1,0 +1,12 @@
+/* TEAM */
+Name: Daniel Péger
+Role: Interaction designer
+Location: Budapest, Hungary
+Site: https://www.danielpeger.xyz/
+Contact: pegerdaniel@gmail.com
+GitHub: https://github.com/danielpeger
+LinkedIn: https://www.linkedin.com/in/danielpeger/
+
+/* SITE */
+Language: English
+Standards: HTML5, CSS3
