@@ -1,6 +1,12 @@
 // Lightbox for the hero and the images and videos inside an article.
 // Leave one out with data-lightbox="off" on that element.
 // A still opens <its src folder>/full.avif. A video opens its own src.
+//
+// Stills use ramka as documented: imageRef on the page <img> bridges the
+// already-decoded thumbnail, Media width/height sizes the morph, and the
+// default awaitImageDecode waits briefly for full.avif. Videos stay custom
+// below — Safari will not snapshot a <video> into a view transition, and
+// these files have no poster image for Trigger crossfade="close".
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -34,26 +40,8 @@ function collectSlides() {
     .filter((slide) => slide.src && slide.width > 0 && slide.height > 0);
 }
 
-// Keep decoded full-size stills alive so the open morph snapshots the sharp
-// image instead of an empty frame. Bytes start loading immediately; decode
-// runs one image at a time so a page of heroes doesn't decode all at once.
-const decodedStills = new Map();
-
-function decodeStill(src) {
-  let img = decodedStills.get(src);
-  if (!img) {
-    img = new Image();
-    img.decoding = "async";
-    img.src = src;
-    decodedStills.set(src, img);
-  }
-  return img.decode?.().catch(() => {});
-}
-
-// A video's max-content size is the browser default (300×150) until metadata
-// loads, which makes the opening morph shrink and then jump. Capture the
-// frame the page is already showing so the lightbox video has a poster
-// immediately, and cap the box from the known native size instead.
+// One frame from the page video, used as the lightbox poster so Media can
+// bridge pixels the way it does for an <img>. There is no poster file.
 const videoPosters = new Map();
 
 function capturePoster(item) {
@@ -69,7 +57,7 @@ function capturePoster(item) {
     ctx.drawImage(source, 0, 0);
     videoPosters.set(item.src, canvas.toDataURL("image/jpeg", 0.72));
   } catch {
-    // The size cap does not depend on the poster.
+    // Tainted or not paintable yet. The open wait below covers that case.
   }
 }
 
@@ -82,24 +70,6 @@ function preloadVideos(items) {
     if (source.readyState >= 2) grab();
     else source.addEventListener("loadeddata", grab, { once: true });
   }
-}
-
-function preloadStills(items) {
-  const stills = items.filter((item) => !item.video);
-  for (const item of stills) {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "image";
-    link.href = item.src;
-    link.fetchPriority = "low";
-    document.head.append(link);
-  }
-  const run = () => {
-    let chain = Promise.resolve();
-    for (const item of stills) chain = chain.then(() => decodeStill(item.src));
-  };
-  if ("requestIdleCallback" in window) requestIdleCallback(run);
-  else setTimeout(run, 1);
 }
 
 function Arrow() {
@@ -140,9 +110,9 @@ function CloseIcon() {
   );
 }
 
-// Cap the box at one device pixel per source pixel. A video's width
-// attribute is the file size. A still's is the page layout size, so its
-// cap uses full.avif once that has loaded.
+// Cap a video at one device pixel per source pixel. Its width attribute is
+// the file size. Stills use Media's fit-box; their full.avif size is not
+// known until that file loads, which is ramka's own decode wait.
 function useDevicePixelRatio() {
   const [dpr, setDpr] = useState(() => window.devicePixelRatio || 1);
 
@@ -156,52 +126,32 @@ function useDevicePixelRatio() {
   return dpr;
 }
 
-function stillPixels(src) {
-  const img = decodedStills.get(src);
-  if (!img || !(img.naturalWidth > 0)) return null;
-  return { width: img.naturalWidth, height: img.naturalHeight };
+function waitForVideoFrame(destination, signal) {
+  const video = destination?.querySelector("video");
+  if (!video || video.readyState >= 2 || video.getAttribute("poster")) return;
+  return new Promise((resolve) => {
+    const finish = () => {
+      clearTimeout(timer);
+      video.removeEventListener("loadeddata", finish);
+      resolve();
+    };
+    const timer = setTimeout(finish, 1500);
+    video.addEventListener("loadeddata", finish, { once: true });
+    signal.addEventListener("abort", finish, { once: true });
+  });
 }
 
-function useStillPixels(src) {
-  const [pixels, setPixels] = useState(() => stillPixels(src));
-
-  const remember = useCallback((img) => {
-    if (!img || !(img.naturalWidth > 0)) return;
-    setPixels((prev) =>
-      prev?.width === img.naturalWidth && prev?.height === img.naturalHeight
-        ? prev
-        : { width: img.naturalWidth, height: img.naturalHeight },
-    );
-  }, []);
-
-  useEffect(() => {
-    const img = decodedStills.get(src);
-    if (!img) return;
-    if (img.complete) remember(img);
-    else {
-      const apply = () => remember(img);
-      img.addEventListener("load", apply, { once: true });
-      return () => img.removeEventListener("load", apply);
-    }
-  }, [remember, src]);
-
-  return [pixels, remember];
-}
-
-function SlideMedia({ item, active, dpr }) {
+function VideoSlide({ item, active, dpr }) {
   const videoRef = useRef(null);
-  const [still, rememberStill] = useStillPixels(item.src);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (active) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
+    if (active) video.play().catch(() => {});
+    else video.pause();
   }, [active]);
 
+  // A live frame for the Safari close, which cannot snapshot <video>.
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !active) return undefined;
@@ -236,77 +186,34 @@ function SlideMedia({ item, active, dpr }) {
     };
   }, [active]);
 
-  const ratio = item.width / item.height;
-  const pixels = item.video
-    ? { width: item.width, height: item.height }
-    : still;
-
   return (
     <Lightbox.Media
       width={item.width}
       height={item.height}
       style={{
-        width: `min(100cqw, calc(100cqh * ${ratio}))`,
-        ...(pixels
-          ? {
-              maxWidth: `${pixels.width / dpr}px`,
-              maxHeight: `${pixels.height / dpr}px`,
-              minWidth: 0,
-              minHeight: 0,
-            }
-          : { maxWidth: "max-content" }),
+        maxWidth: `${item.width / dpr}px`,
+        maxHeight: `${item.height / dpr}px`,
+        minWidth: 0,
+        minHeight: 0,
       }}
     >
-      {item.video ? (
-        <video
-          ref={videoRef}
-          src={item.src}
-          poster={videoPosters.get(item.src) || undefined}
-          width={item.width}
-          height={item.height}
-          muted
-          loop
-          playsInline
-          style={{ objectFit: "cover" }}
-        />
-      ) : (
-        <img
-          src={item.src}
-          alt={item.alt}
-          loading="eager"
-          decoding="async"
-          onLoad={(event) => rememberStill(event.currentTarget)}
-          ref={(node) => {
-            if (node?.complete) rememberStill(node);
-          }}
-        />
-      )}
+      <video
+        ref={videoRef}
+        src={item.src}
+        poster={videoPosters.get(item.src) || undefined}
+        width={item.width}
+        height={item.height}
+        muted
+        loop
+        playsInline
+      />
     </Lightbox.Media>
   );
 }
 
-function KeptPicture({ el, imageRef, morphRef }) {
-  const holderRef = useCallback(
-    (node) => {
-      if (node && el.parentNode !== node) node.appendChild(el);
-    },
-    [el],
-  );
-
-  useLayoutEffect(() => {
-    morphRef(el);
-    const img = el.shadowRoot?.querySelector("img");
-    if (img) imageRef(img);
-    return () => {
-      morphRef(null);
-      if (img) imageRef(null);
-    };
-  }, [el, imageRef, morphRef]);
-
-  return <span ref={holderRef} style={{ display: "contents" }} />;
-}
-
-function PictureTrigger({ item, index }) {
+// The page is static HTML. Ramka's trigger has to own the existing element
+// so the morph starts there, and imageRef has to see the shadow-DOM <img>.
+function PageTrigger({ item, index }) {
   const [slot, setSlot] = useState(null);
 
   useLayoutEffect(() => {
@@ -321,28 +228,41 @@ function PictureTrigger({ item, index }) {
 
   if (!slot) return null;
 
-  const warm = () => {
-    if (!item.video) decodeStill(item.src);
-  };
-
   return createPortal(
     <Lightbox.Trigger
       index={index}
       aria-label={item.alt || item.caption || (item.video ? "Video" : "Image")}
-      onPointerEnter={warm}
-      onFocus={warm}
     >
       {({ imageRef, morphRef }) => (
-        <KeptPicture el={item.el} imageRef={imageRef} morphRef={morphRef} />
+        <Adopted element={item.el} imageRef={imageRef} morphRef={morphRef} />
       )}
     </Lightbox.Trigger>,
     slot,
   );
 }
 
+function Adopted({ element, imageRef, morphRef }) {
+  const hold = useCallback(
+    (node) => {
+      if (node && element.parentNode !== node) node.appendChild(element);
+    },
+    [element],
+  );
+
+  useLayoutEffect(() => {
+    morphRef(element);
+    const img = element.shadowRoot?.querySelector("img");
+    if (img) imageRef(img);
+    return () => {
+      morphRef(null);
+      if (img) imageRef(null);
+    };
+  }, [element, imageRef, morphRef]);
+
+  return <span ref={hold} style={{ display: "contents" }} />;
+}
+
 function App({ items }) {
-  const [open, setOpen] = useState(false);
-  const [index, setIndex] = useState(0);
   const dpr = useDevicePixelRatio();
   const several = items.length > 1;
 
@@ -350,15 +270,15 @@ function App({ items }) {
     <Lightbox.Root
       license="gpl"
       loop={several}
-      awaitImageDecode={2000}
-      viewTransition="spring"
-      open={open}
-      onOpenChange={setOpen}
-      value={index}
-      onValueChange={setIndex}
+      onBeforeOpen={({ destination, signal }) =>
+        waitForVideoFrame(destination, signal)
+      }
+      onBeforeClose={({ destination }) => {
+        destination?.querySelector("video")?.pause();
+      }}
     >
       {items.map((item, i) => (
-        <PictureTrigger key={item.src} item={item} index={i} />
+        <PageTrigger key={item.src} item={item} index={i} />
       ))}
       <Lightbox.Portal>
         <Lightbox.Backdrop className="lb-backdrop" />
@@ -367,7 +287,6 @@ function App({ items }) {
             className="lb-slides"
             aria-label="Article media"
             aria-roledescription="carousel"
-            preload={1}
           >
             {items.map((item, i) => (
               <Lightbox.Slide key={item.src} className="lb-slide">
@@ -377,11 +296,26 @@ function App({ items }) {
                   aria-roledescription="slide"
                   aria-label={`${i + 1} of ${items.length}`}
                 >
-                  {({ active }) => (
-                    <Lightbox.Zoom>
-                      <SlideMedia item={item} active={active && open} dpr={dpr} />
-                    </Lightbox.Zoom>
-                  )}
+                  {item.video
+                    ? ({ active }) => (
+                        <Lightbox.Zoom>
+                          <VideoSlide item={item} active={active} dpr={dpr} />
+                        </Lightbox.Zoom>
+                      )
+                    : (
+                        <Lightbox.Zoom>
+                          <Lightbox.Media width={item.width} height={item.height}>
+                            <img
+                              src={item.src}
+                              alt={item.alt}
+                              width={item.width}
+                              height={item.height}
+                              loading="eager"
+                              decoding="async"
+                            />
+                          </Lightbox.Media>
+                        </Lightbox.Zoom>
+                      )}
                 </Lightbox.Item>
               </Lightbox.Slide>
             ))}
@@ -447,12 +381,16 @@ style.textContent = `
     cursor: zoom-in;
   }
 
+  [data-ramka-media] > img,
+  [data-ramka-media] > video {
+    object-fit: cover;
+  }
+
   .lb-backdrop {
     position: fixed;
     inset: 0;
     background: rgb(255 255 255 / 0.9);
     z-index: 20;
-
   }
 
   .lb-content {
@@ -600,7 +538,6 @@ style.textContent = `
       display: flex;
     }
   }
-
 `;
 
 function closeWithStill(callback) {
@@ -625,8 +562,6 @@ function closeWithStill(callback) {
     (el) => el.style.viewTransitionName === "lightbox-morph",
   );
   const to = dest?.getBoundingClientRect() || from;
-  // The page video loses data-morph-target inside the close commit, so it
-  // would paint under the flying still. Hold it until the shrink lands.
   const previousVisibility = dest?.style.visibility ?? "";
   if (dest) dest.style.visibility = "hidden";
   const anim = canvas.animate(
@@ -644,8 +579,7 @@ function closeWithStill(callback) {
         height: `${to.height}px`,
       },
     ],
-    // Ramka's "spring" preset: 450ms, nearest bezier to the protected settle.
-    { duration: 450, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
+    { duration: 360, easing: "cubic-bezier(0.44, 0.58, 0, 1)", fill: "both" },
   );
   const finished = anim.finished.finally(() => {
     if (dest?.isConnected) dest.style.visibility = previousVisibility;
@@ -674,7 +608,6 @@ if (typeof document.startViewTransition === "function") {
 }
 
 const items = collectSlides();
-preloadStills(items);
 preloadVideos(items);
 
 if (items.length > 0) {
