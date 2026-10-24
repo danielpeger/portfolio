@@ -57,6 +57,12 @@ article .rule {
   margin: 0;
 }
 
+.page progressive-image:not([data-lightbox="off"]),
+article progressive-image:not([data-lightbox="off"]),
+article progressive-video:not([data-lightbox="off"]) {
+  cursor: zoom-in;
+}
+
 article figure {
   display: flex;
   flex-direction: column;
