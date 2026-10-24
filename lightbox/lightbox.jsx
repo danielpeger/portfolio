@@ -53,7 +53,7 @@ function decodeStill(src) {
 // A video's max-content size is the browser default (300×150) until metadata
 // loads, which makes the opening morph shrink and then jump. Capture the
 // frame the page is already showing so the lightbox video has a poster
-// immediately, and cap the box with the known native width instead.
+// immediately, and cap the box from the known native size instead.
 const videoPosters = new Map();
 
 function capturePoster(item) {
@@ -71,19 +71,6 @@ function capturePoster(item) {
   } catch {
     // The size cap does not depend on the poster.
   }
-}
-
-// Safari replaces the view-transition animation a frame after it starts.
-// That gap is a blank frame when the snapshot is a video. Chrome keeps the
-// original animation, so only a video close in Safari skips the replacement.
-function holdSafariVideoClose() {
-  if (!("GestureEvent" in window)) return;
-  if (!document.querySelector("[data-ramka-item][data-active] video")) return;
-  window.__RAMKA_VT_COMPOSITED__ = false;
-}
-
-function releaseSafariVideoClose() {
-  delete window.__RAMKA_VT_COMPOSITED__;
 }
 
 function preloadVideos(items) {
@@ -153,8 +140,57 @@ function CloseIcon() {
   );
 }
 
-function SlideMedia({ item, active }) {
+// Cap the box at one device pixel per source pixel. A video's width
+// attribute is the file size. A still's is the page layout size, so its
+// cap uses full.avif once that has loaded.
+function useDevicePixelRatio() {
+  const [dpr, setDpr] = useState(() => window.devicePixelRatio || 1);
+
+  useEffect(() => {
+    const media = window.matchMedia(`(resolution: ${dpr}dppx)`);
+    const onChange = () => setDpr(window.devicePixelRatio || 1);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, [dpr]);
+
+  return dpr;
+}
+
+function stillPixels(src) {
+  const img = decodedStills.get(src);
+  if (!img || !(img.naturalWidth > 0)) return null;
+  return { width: img.naturalWidth, height: img.naturalHeight };
+}
+
+function useStillPixels(src) {
+  const [pixels, setPixels] = useState(() => stillPixels(src));
+
+  const remember = useCallback((img) => {
+    if (!img || !(img.naturalWidth > 0)) return;
+    setPixels((prev) =>
+      prev?.width === img.naturalWidth && prev?.height === img.naturalHeight
+        ? prev
+        : { width: img.naturalWidth, height: img.naturalHeight },
+    );
+  }, []);
+
+  useEffect(() => {
+    const img = decodedStills.get(src);
+    if (!img) return;
+    if (img.complete) remember(img);
+    else {
+      const apply = () => remember(img);
+      img.addEventListener("load", apply, { once: true });
+      return () => img.removeEventListener("load", apply);
+    }
+  }, [remember, src]);
+
+  return [pixels, remember];
+}
+
+function SlideMedia({ item, active, dpr }) {
   const videoRef = useRef(null);
+  const [still, rememberStill] = useStillPixels(item.src);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -166,7 +202,44 @@ function SlideMedia({ item, active }) {
     }
   }, [active]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !active) return undefined;
+    const canvas = document.createElement("canvas");
+    canvas.dataset.lbStill = "1";
+    canvas.style.cssText =
+      "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;";
+    const parent = video.parentElement;
+    if (parent && getComputedStyle(parent).position === "static") {
+      parent.style.position = "relative";
+    }
+    video.lbStill = canvas;
+    let frame = 0;
+    const draw = () => {
+      if (canvas.dataset.lbFlying === "1") return;
+      if (parent && !canvas.isConnected) parent.appendChild(canvas);
+      if (video.videoWidth) {
+        if (canvas.width !== video.videoWidth) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        }
+        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.dataset.lbReady = "1";
+      }
+      frame = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => {
+      cancelAnimationFrame(frame);
+      if (canvas.dataset.lbFlying !== "1") canvas.remove();
+      if (video.lbStill === canvas) video.lbStill = null;
+    };
+  }, [active]);
+
   const ratio = item.width / item.height;
+  const pixels = item.video
+    ? { width: item.width, height: item.height }
+    : still;
 
   return (
     <Lightbox.Media
@@ -174,7 +247,14 @@ function SlideMedia({ item, active }) {
       height={item.height}
       style={{
         width: `min(100cqw, calc(100cqh * ${ratio}))`,
-        maxWidth: item.video ? `${item.width}px` : "max-content",
+        ...(pixels
+          ? {
+              maxWidth: `${pixels.width / dpr}px`,
+              maxHeight: `${pixels.height / dpr}px`,
+              minWidth: 0,
+              minHeight: 0,
+            }
+          : { maxWidth: "max-content" }),
       }}
     >
       {item.video ? (
@@ -190,7 +270,16 @@ function SlideMedia({ item, active }) {
           style={{ objectFit: "cover" }}
         />
       ) : (
-        <img src={item.src} alt={item.alt} loading="eager" decoding="async" />
+        <img
+          src={item.src}
+          alt={item.alt}
+          loading="eager"
+          decoding="async"
+          onLoad={(event) => rememberStill(event.currentTarget)}
+          ref={(node) => {
+            if (node?.complete) rememberStill(node);
+          }}
+        />
       )}
     </Lightbox.Media>
   );
@@ -254,6 +343,7 @@ function PictureTrigger({ item, index }) {
 function App({ items }) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const dpr = useDevicePixelRatio();
   const several = items.length > 1;
 
   return (
@@ -263,10 +353,6 @@ function App({ items }) {
       awaitImageDecode={2000}
       open={open}
       onOpenChange={setOpen}
-      onOpenChangeComplete={(next) => {
-        if (!next) releaseSafariVideoClose();
-      }}
-      onBeforeClose={holdSafariVideoClose}
       value={index}
       onValueChange={setIndex}
     >
@@ -292,7 +378,7 @@ function App({ items }) {
                 >
                   {({ active }) => (
                     <Lightbox.Zoom>
-                      <SlideMedia item={item} active={active && open} />
+                      <SlideMedia item={item} active={active && open} dpr={dpr} />
                     </Lightbox.Zoom>
                   )}
                 </Lightbox.Item>
@@ -465,6 +551,75 @@ style.textContent = `
   }
 
 `;
+
+function closeWithStill(callback) {
+  const host = [...document.querySelectorAll("*")].find(
+    (el) => el.style.viewTransitionName === "lightbox-morph",
+  );
+  const canvas = host?.querySelector("[data-lb-still]");
+  if (
+    !host ||
+    !canvas ||
+    canvas.dataset.lbReady !== "1" ||
+    !("GestureEvent" in window)
+  ) {
+    return null;
+  }
+  const from = host.getBoundingClientRect();
+  canvas.dataset.lbFlying = "1";
+  canvas.style.cssText = `position:fixed;left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px;z-index:2147483646;pointer-events:none;margin:0;`;
+  document.body.appendChild(canvas);
+  callback();
+  const dest = [...document.querySelectorAll("*")].find(
+    (el) => el.style.viewTransitionName === "lightbox-morph",
+  );
+  const to = dest?.getBoundingClientRect() || from;
+  // The page video loses data-morph-target inside the close commit, so it
+  // would paint under the flying still. Hold it until the shrink lands.
+  const previousVisibility = dest?.style.visibility ?? "";
+  if (dest) dest.style.visibility = "hidden";
+  const anim = canvas.animate(
+    [
+      {
+        left: `${from.left}px`,
+        top: `${from.top}px`,
+        width: `${from.width}px`,
+        height: `${from.height}px`,
+      },
+      {
+        left: `${to.left}px`,
+        top: `${to.top}px`,
+        width: `${to.width}px`,
+        height: `${to.height}px`,
+      },
+    ],
+    { duration: 360, easing: "cubic-bezier(0.44, 0.58, 0, 1)", fill: "both" },
+  );
+  const finished = anim.finished.finally(() => {
+    if (dest?.isConnected) dest.style.visibility = previousVisibility;
+    canvas.remove();
+  });
+  return {
+    ready: Promise.resolve(),
+    finished,
+    updateCallbackDone: finished,
+    skipTransition() {},
+  };
+}
+
+if (typeof document.startViewTransition === "function") {
+  const nativeStart = document.startViewTransition.bind(document);
+  document.startViewTransition = (callback) => {
+    const phase = document.documentElement.getAttribute(
+      "data-ramka-view-transition",
+    );
+    if (phase === "closing") {
+      const still = closeWithStill(callback);
+      if (still) return still;
+    }
+    return nativeStart(callback);
+  };
+}
 
 const items = collectSlides();
 preloadStills(items);
