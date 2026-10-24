@@ -398,7 +398,32 @@ function App({ items }) {
           <Lightbox.Close className="lb-close" aria-label="Close">
             <CloseIcon />
           </Lightbox.Close>
-          <Lightbox.Caption className="lb-caption" />
+          <Lightbox.Caption
+            className="lb-caption"
+            render={
+              several
+                ? (props, state) => {
+                    const { children, ...rest } = props;
+                    return (
+                      <div {...rest}>
+                        {children ? (
+                          <span className="lb-caption-text">{children}</span>
+                        ) : null}
+                        <span className="lb-dots" aria-hidden="true">
+                          {items.map((item, i) => (
+                            <span
+                              key={item.src}
+                              className="lb-dot"
+                              data-active={i === state.index ? "" : undefined}
+                            />
+                          ))}
+                        </span>
+                      </div>
+                    );
+                  }
+                : undefined
+            }
+          />
         </Lightbox.Content>
       </Lightbox.Portal>
     </Lightbox.Root>
@@ -436,27 +461,11 @@ style.textContent = `
     display: flex;
     color: #000;
     outline: none;
-    pointer-events: none;
-  }
-
-  .lb-slides,
-  .lb-slide {
-    pointer-events: none;
-  }
-
-  .lb-content [data-ramka-media],
-  .lb-prev,
-  .lb-next,
-  .lb-close {
-    pointer-events: auto;
-  }
-
-  [data-ramka-zoom]:not([data-zoom]):not([data-dragging]) [data-ramka-media] {
-    cursor: auto;
   }
 
   .lb-slides {
     flex: 1;
+    min-width: 0;
     min-height: 0;
     display: flex;
   }
@@ -526,6 +535,10 @@ style.textContent = `
     left: 64px;
     right: 64px;
     bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     margin: 0;
     text-align: center;
     font-family: "General Sans", sans-serif;
@@ -538,15 +551,52 @@ style.textContent = `
     pointer-events: none;
   }
 
+  .lb-caption-text {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .lb-dots {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .lb-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.28;
+  }
+
+  .lb-dot[data-active] {
+    opacity: 1;
+  }
+
   @media (max-width: 600px) {
+    .lb-backdrop {
+      background: #fff;
+    }
+
+    .lb-prev,
+    .lb-next {
+      display: none;
+    }
+
     .lb-slide {
-      padding: 56px 12px 64px;
+      padding: 56px 12px 80px;
     }
 
     .lb-caption {
       left: 16px;
       right: 16px;
       bottom: 16px;
+    }
+
+    .lb-dots {
+      display: flex;
     }
   }
 
