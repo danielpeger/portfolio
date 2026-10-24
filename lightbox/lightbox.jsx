@@ -351,6 +351,7 @@ function App({ items }) {
       license="gpl"
       loop={several}
       awaitImageDecode={2000}
+      viewTransition="spring"
       open={open}
       onOpenChange={setOpen}
       value={index}
@@ -643,7 +644,8 @@ function closeWithStill(callback) {
         height: `${to.height}px`,
       },
     ],
-    { duration: 360, easing: "cubic-bezier(0.44, 0.58, 0, 1)", fill: "both" },
+    // Ramka's "spring" preset: 450ms, nearest bezier to the protected settle.
+    { duration: 450, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
   );
   const finished = anim.finished.finally(() => {
     if (dest?.isConnected) dest.style.visibility = previousVisibility;
