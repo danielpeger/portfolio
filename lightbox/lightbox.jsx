@@ -414,7 +414,7 @@ style.textContent = `
     min-width: 100%;
     height: 100%;
     box-sizing: border-box;
-    padding: 56px 64px 72px;
+    padding: 56px 64px 88px;
   }
 
   .lb-prev,
@@ -496,7 +496,7 @@ style.textContent = `
   }
 
   .lb-dots {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
@@ -532,10 +532,6 @@ style.textContent = `
       left: 16px;
       right: 16px;
       bottom: 16px;
-    }
-
-    .lb-dots {
-      display: flex;
     }
   }
 `;

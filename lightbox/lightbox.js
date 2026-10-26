@@ -222,7 +222,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
     min-width: 100%;
     height: 100%;
     box-sizing: border-box;
-    padding: 56px 64px 72px;
+    padding: 56px 64px 88px;
   }
 
   .lb-prev,
@@ -304,7 +304,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
   }
 
   .lb-dots {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
@@ -340,10 +340,6 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
       left: 16px;
       right: 16px;
       bottom: 16px;
-    }
-
-    .lb-dots {
-      display: flex;
     }
   }
 `;function tC(t){let e=[...document.querySelectorAll("*")].find(c=>c.style.viewTransitionName==="lightbox-morph"),n=e?.querySelector("[data-lb-still]");if(!e||!n||n.dataset.lbReady!=="1"||!("GestureEvent"in window))return null;let l=e.getBoundingClientRect();n.dataset.lbFlying="1",n.style.cssText=`position:fixed;left:${l.left}px;top:${l.top}px;width:${l.width}px;height:${l.height}px;z-index:2147483646;pointer-events:none;margin:0;`,document.body.appendChild(n),t();let a=[...document.querySelectorAll("*")].find(c=>c.style.viewTransitionName==="lightbox-morph"),u=a?.getBoundingClientRect()||l,i=a?.style.visibility??"";a&&(a.style.visibility="hidden");let r=n.animate([{left:`${l.left}px`,top:`${l.top}px`,width:`${l.width}px`,height:`${l.height}px`},{left:`${u.left}px`,top:`${u.top}px`,width:`${u.width}px`,height:`${u.height}px`}],{duration:360,easing:"cubic-bezier(0.44, 0.58, 0, 1)",fill:"both"}).finished.finally(()=>{a?.isConnected&&(a.style.visibility=i),n.remove()});return{ready:Promise.resolve(),finished:r,updateCallbackDone:r,skipTransition(){}}}if(typeof document.startViewTransition=="function"){let t=document.startViewTransition.bind(document);document.startViewTransition=e=>{if(document.documentElement.getAttribute("data-ramka-view-transition")==="closing"){let l=tC(e);if(l)return l}return t(e)}}var _h=jM();KM(_h);if(_h.length>0){document.head.append(US);let t=document.createElement("div");document.body.append(t),(0,HS.createRoot)(t).render((0,yt.jsx)(WM,{items:_h}))}
