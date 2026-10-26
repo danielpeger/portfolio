@@ -197,7 +197,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
   .lb-backdrop {
     position: fixed;
     inset: 0;
-    background: rgb(255 255 255 / 0.9);
+    background: #fff;
     z-index: 20;
   }
 
@@ -323,10 +323,6 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
   }
 
   @media (max-width: 600px) {
-    .lb-backdrop {
-      background: #fff;
-    }
-
     .lb-prev,
     .lb-next {
       display: none;

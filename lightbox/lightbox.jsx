@@ -389,7 +389,7 @@ style.textContent = `
   .lb-backdrop {
     position: fixed;
     inset: 0;
-    background: rgb(255 255 255 / 0.9);
+    background: #fff;
     z-index: 20;
   }
 
@@ -515,10 +515,6 @@ style.textContent = `
   }
 
   @media (max-width: 600px) {
-    .lb-backdrop {
-      background: #fff;
-    }
-
     .lb-prev,
     .lb-next {
       display: none;
