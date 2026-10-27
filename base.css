@@ -105,6 +105,7 @@ p {
   font-weight: var(--weight-body);
   font-variation-settings: "wght" var(--weight-body);
   text-align: justify;
+  text-indent: 1.5em;
   hyphens: auto;
   -webkit-hyphens: auto;
   font-size: 16px;
