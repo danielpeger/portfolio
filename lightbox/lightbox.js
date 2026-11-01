@@ -197,7 +197,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
   .lb-backdrop {
     position: fixed;
     inset: 0;
-    background: #fff;
+    background: var(--color-bg);
     z-index: 20;
   }
 
@@ -206,7 +206,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
     inset: 0;
     z-index: 21;
     display: flex;
-    color: #000;
+    color: var(--color-text);
     outline: none;
   }
 
@@ -236,8 +236,8 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
     height: 48px;
     padding: 0;
     border: 0;
-    background: #fff;
-    color: #000;
+    background: var(--color-bg);
+    color: var(--color-text);
     cursor: pointer;
   }
 
@@ -273,7 +273,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
   .lb-prev:focus-visible,
   .lb-next:focus-visible,
   .lb-close:focus-visible {
-    outline: 1px solid #000;
+    outline: 1px solid var(--color-text);
     outline-offset: 2px;
   }
 
@@ -294,7 +294,7 @@ https://ramka.dev/license`;function eS(t){tS.useEffect(()=>{},[t])}function xh(t
     font-weight: var(--weight-body);
     font-variation-settings: "wght" var(--weight-body);
     line-height: normal;
-    color: #000;
+    color: var(--color-text);
     pointer-events: none;
   }
 

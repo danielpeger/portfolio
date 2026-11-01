@@ -18,7 +18,7 @@ class ProgressiveImage extends HTMLElement {
         position: relative;
         flex-shrink: 0;
         overflow: hidden;
-        background: #c8c8c8;
+        background: var(--color-placeholder);
         width: ${width}px;
         max-width: 100%;
         height: auto;

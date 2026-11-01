@@ -18,7 +18,7 @@ class ProgressiveVideo extends HTMLElement {
         position: relative;
         flex-shrink: 0;
         overflow: hidden;
-        background: #c8c8c8;
+        background: var(--color-placeholder);
         width: ${width}px;
         max-width: 100%;
         height: auto;
@@ -84,7 +84,7 @@ class ProgressiveVideo extends HTMLElement {
     spinner.className = "spinner";
     spinner.innerHTML = `
       <svg viewBox="0 0 19 19" fill="none" aria-hidden="true">
-        <path d="M9.5 3.16667A6.33333 6.33333 0 1 1 4.2 5.55" stroke="#000000" stroke-width="1.1875" stroke-linecap="square"/>
+        <path d="M9.5 3.16667A6.33333 6.33333 0 1 1 4.2 5.55" stroke="var(--color-text)" stroke-width="1.1875" stroke-linecap="square"/>
       </svg>
     `;
 

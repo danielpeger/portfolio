@@ -23,6 +23,7 @@
 }
 
 :root {
+  color-scheme: light;
   --weight-medium: 500;
   --weight-body: 470;
   --color-text: #000000;
@@ -30,6 +31,22 @@
   --color-bg: #ffffff;
   --color-placeholder: #c8c8c8;
   --color-border: #d4d4d4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-text: #ffffff;
+    --color-muted: #999999;
+    --color-bg: #000000;
+    --color-placeholder: #c8c8c8;
+    --color-border: #2b2b2b;
+  }
+
+  /* The sketch is black ink on a transparent canvas. */
+  voronoi-sketch {
+    filter: invert(1);
+  }
 }
 
 * {
