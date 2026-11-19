@@ -3,7 +3,7 @@
 // are pushed apart so the borders don't whip around when two sites pass.
 
 const SCALE = 80;
-const STROKE_CSS_PX = 1.5;
+const STROKE_CSS_PX = 2;
 const CANVAS_SIZE = 2 * SCALE + STROKE_CSS_PX;
 const HALF = SCALE + STROKE_CSS_PX / 2;
 
